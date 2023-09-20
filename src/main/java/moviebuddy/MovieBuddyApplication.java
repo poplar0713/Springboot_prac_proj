@@ -33,7 +33,9 @@ public class MovieBuddyApplication {
      */
 
     public void run(String[] args) throws Exception {
-    	final MovieFinder movie = new MovieFinder(new CsvMovieReader());
+    	
+    	final MovieBuddyFactory movieBuddyFactory = new MovieBuddyFactory();
+    	final MovieFinder movie = movieBuddyFactory.movieFinder();
     	
         final AtomicBoolean running = new AtomicBoolean(true);
         final BufferedReader input = new BufferedReader(new InputStreamReader(System.in));

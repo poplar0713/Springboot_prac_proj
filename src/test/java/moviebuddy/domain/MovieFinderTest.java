@@ -2,14 +2,16 @@ package moviebuddy.domain;
 
 import java.util.List;
 
+import moviebuddy.MovieBuddyFactory;
+
 /**
  * @author springrunner.kr@gmail.com
  */
 public class MovieFinderTest {
 
 	public static void main(String[] args) {
-		MovieFinder movieFinder = new MovieFinder(new CsvMovieReader());
-		//MovieBuddyApplication application = new MovieBuddyApplication();
+		MovieBuddyFactory movieBuddyFactory = new MovieBuddyFactory();
+		MovieFinder movieFinder = movieBuddyFactory.movieFinder();
 		
 		List<Movie> result = movieFinder.directedBy("Michael Bay");
 		assertEquals(3, result.size()); // 기댓값과 일치하는가?
