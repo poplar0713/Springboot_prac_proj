@@ -13,6 +13,7 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import moviebuddy.domain.CsvMovieReader;
 import moviebuddy.domain.Movie;
 import moviebuddy.domain.MovieFinder;
 
@@ -32,13 +33,13 @@ public class MovieBuddyApplication {
      */
 
     public void run(String[] args) throws Exception {
-    	final MovieFinder movie = new MovieFinder();
+    	final MovieFinder movie = new MovieFinder(new CsvMovieReader());
     	
         final AtomicBoolean running = new AtomicBoolean(true);
         final BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
         final PrintWriter output = new PrintWriter(System.out, false);
 
-        /*--------------------------------------------------------------------------------------*/
+        /*--------------- -----------------------------------------------------------------------*/
         /* 명령어 별 실행 로직을 정의한다. */
 
         final Map<Command, Consumer<List<String>>> commandActions = new HashMap<>();
