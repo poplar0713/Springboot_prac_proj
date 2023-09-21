@@ -4,13 +4,15 @@ import java.util.List;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import moviebuddy.MovieBuddyFactory;
 
 public class MovieFinderTest {
 	
-	final MovieBuddyFactory movieBuddyFactory = new MovieBuddyFactory();
-	final MovieFinder movieFinder = movieBuddyFactory.movieFinder();
+	final ApplicationContext applicationContext = new AnnotationConfigApplicationContext(MovieBuddyFactory.class);
+	final MovieFinder movieFinder = applicationContext.getBean(MovieFinder.class);
 	
 	@Test
 	void NoEmpty_directedBy() {
@@ -23,6 +25,9 @@ public class MovieFinderTest {
 		List<Movie> movies = movieFinder.releasedYearBy(2015);
 		Assertions.assertEquals(225, movies.size());
 	}
+	
+//	final MovieBuddyFactory movieBuddyFactory = new MovieBuddyFactory();
+//	final MovieFinder movieFinder = movieBuddyFactory.movieFinder();
 
 //	public static void main(String[] args) {
 //		
