@@ -1,5 +1,5 @@
 # Springboot_prac_proj
-Junit 테스트, SW 디자인 패턴등의 이해를 목적으로 작성하는 프로젝트
+Junit 테스트, SW 디자인 패턴, Ioc/DI, PSA, AOP등의 이해를 목적으로 작성하는 프로젝트
 
 
 ### 사용법
