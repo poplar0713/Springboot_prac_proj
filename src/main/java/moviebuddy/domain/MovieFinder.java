@@ -4,10 +4,15 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+@Service
 public class MovieFinder {
 	
 	private final MovieReader movieReader;
 	
+	@Autowired
 	public MovieFinder(MovieReader movieReader) {
 		this.movieReader = Objects.requireNonNull(movieReader);
 	}

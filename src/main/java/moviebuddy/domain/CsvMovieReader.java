@@ -12,9 +12,13 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
+
 import moviebuddy.ApplicationException;
 import moviebuddy.util.FileSystemUtils;
 
+@Repository
 public class CsvMovieReader implements MovieReader{
 	
 	@Override
