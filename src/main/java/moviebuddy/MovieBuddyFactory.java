@@ -43,7 +43,7 @@ public class MovieBuddyFactory {
 	@Configuration
 	static class DataSourceModuleConfig {
 		@Bean
-		public MovieReader movieReder() {
+		public MovieReader movieReader() {
 			return new CsvMovieReader();
 		}
 	}
