@@ -11,7 +11,8 @@ import moviebuddy.MovieBuddyFactory;
 
 public class MovieFinderTest {
 	
-	final ApplicationContext applicationContext = new AnnotationConfigApplicationContext(MovieBuddyFactory.class);
+	final ApplicationContext applicationContext = 
+			new AnnotationConfigApplicationContext(MovieBuddyFactory.class);
 	final MovieFinder movieFinder = applicationContext.getBean(MovieFinder.class);
 	
 	@Test
