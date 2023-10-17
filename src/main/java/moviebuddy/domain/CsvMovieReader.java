@@ -18,7 +18,7 @@ import org.springframework.stereotype.Repository;
 import moviebuddy.ApplicationException;
 import moviebuddy.util.FileSystemUtils;
 
-@Repository
+@Repository("movieReader")
 public class CsvMovieReader implements MovieReader{
 	
 	@Override
