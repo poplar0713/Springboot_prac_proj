@@ -10,11 +10,13 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import moviebuddy.MovieBuddyFactory;
 
-@ExtendWith(SpringExtension.class) // JUnit이 테스트 실행전략을 확장할 때 사
-@ContextConfiguration(classes = MovieBuddyFactory.class) // 테스트를 필요로 하는 스프링 컨테이너를 구성, 관리 
+@SpringJUnitConfig(MovieBuddyFactory.class)
+//@ExtendWith(SpringExtension.class) // JUnit이 테스트 실행전략을 확장할 때 사용 
+//@ContextConfiguration(classes = MovieBuddyFactory.class) // 테스트를 필요로 하는 스프링 컨테이너를 구성, 관리 
 public class MovieFinderTest {
 	
 //	final ApplicationContext applicationContext = 
