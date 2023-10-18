@@ -5,7 +5,6 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -14,10 +13,9 @@ public class MovieFinder {
 	private final MovieReader movieReader;
 	
 	@Autowired
-	public MovieFinder(@Qualifier("csvMovieReader") MovieReader movieReader) {
+	public MovieFinder(MovieReader movieReader) {
 		this.movieReader = Objects.requireNonNull(movieReader);
 	}
-	
 
 	/**
      * 저장된 영화 목록에서 감독으로 영화를 검색한다.
