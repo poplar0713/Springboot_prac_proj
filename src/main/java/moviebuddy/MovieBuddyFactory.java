@@ -1,21 +1,31 @@
 package moviebuddy;
 
-//import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Bean;
+//import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 //import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.Import;
+import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 
 //import moviebuddy.domain.CsvMovieReader;
-import moviebuddy.domain.MovieFinder;
-import moviebuddy.domain.MovieReader;
+//import moviebuddy.domain.MovieFinder;
+//import moviebuddy.domain.MovieReader;
 
 
 @Configuration
 @ComponentScan(basePackages = { "moviebuddy" })
 @Import({MovieBuddyFactory.DomainModuleConfig.class, MovieBuddyFactory.DataSourceModuleConfig.class})
 public class MovieBuddyFactory {
+	
+	@Bean
+	public Jaxb2Marshaller jaxb2Marshaller() {
+		Jaxb2Marshaller marshaller = new Jaxb2Marshaller();
+		marshaller.setPackagesToScan("moviebuddy");
+		
+		return marshaller;
+	}
+	
 	
 	/*
 	 * 1. Singleton 스코프: 스프링 컨테이너는 singleton 스코프로 정의된 빈에 대해 하나의 인스턴스만을 생성하며, 이후 같은 빈을 요청하면 항상 동일한 인스턴스를 반환한다.
@@ -49,5 +59,4 @@ public class MovieBuddyFactory {
 //			return new CsvMovieReader();
 //		}
 	}
-	
 }
