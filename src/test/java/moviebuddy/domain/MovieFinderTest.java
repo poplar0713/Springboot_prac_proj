@@ -1,12 +1,20 @@
 package moviebuddy.domain;
 
+import java.io.FileNotFoundException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
+import java.util.Objects;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextException;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
@@ -26,6 +34,15 @@ public class MovieFinderTest {
 //			new AnnotationConfigApplicationContext(MovieBuddyFactory.class);
 	@Autowired
 	MovieFinder movieFinder;
+	private String metadata;
+	
+	public String getmetadata() {
+		return metadata;
+	}
+	
+	public void setMetadata(String metadata) throws FileNotFoundException, URISyntaxException {
+		this.metadata = metadata;
+	}
 	
 	@Test
 	void NoEmpty_directedBy() {

@@ -1,4 +1,4 @@
-package moviebuddy.data;
+ package moviebuddy.data;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,7 +23,7 @@ import moviebuddy.domain.MovieReader;
 
 @Profile(MovieBuddyProfile.XML_MODE)
 @Repository
-public class XmlMovieReader implements MovieReader {
+public class XmlMovieReader extends AbstractFileSystemMovieReader implements MovieReader {
 	
 	private final Unmarshaller unmarshaller;
 	
@@ -34,7 +34,7 @@ public class XmlMovieReader implements MovieReader {
 	@Override
 	public List<Movie> loadMovies() {
 		try {
-			final InputStream content = ClassLoader.getSystemResourceAsStream("movie_metadata.xml");
+			final InputStream content = ClassLoader.getSystemResourceAsStream(getMetadata());
 			final Source source = new StreamSource(content);
 			final MovieMetadata metadata = (MovieMetadata) unmarshaller.unmarshal(source);
 			
