@@ -1,6 +1,11 @@
 package moviebuddy;
 
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.caffeine.CaffeineCacheManager;
 import org.springframework.context.annotation.Bean;
 //import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.ComponentScan;
@@ -13,8 +18,12 @@ import org.springframework.core.env.Environment;
 import org.springframework.oxm.Unmarshaller;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+
 import moviebuddy.data.CsvMovieReader;
 import moviebuddy.data.XmlMovieReader;
+import moviebuddy.domain.Movie;
 
 //import moviebuddy.domain.CsvMovieReader;
 //import moviebuddy.domain.MovieFinder;
@@ -61,32 +70,41 @@ public class MovieBuddyFactory {
 //		}
 	}
 	
+	@Bean
+	public CacheManager caffeineCacheManager() {
+		CaffeineCacheManager cacheManager = new CaffeineCacheManager();
+		cacheManager.setCaffeine(Caffeine.newBuilder().expireAfterWrite(3, TimeUnit.SECONDS));
+		
+		return cacheManager;
+	}
+	
 	@Configuration
 	static class DataSourceModuleConfig {
 		
-		private final Environment environment;
+//		private final Environment environment;
+//		
+//		@Autowired
+//		public DataSourceModuleConfig(Environment environment) {
+//			this.environment = environment;
+//		}
+//		
+//		@Profile(MovieBuddyProfile.CSV_MODE)
+//		@Bean
+//		public CsvMovieReader csvMovieReader () {
+//			CsvMovieReader movieReader = new CsvMovieReader();
+//			
+//			//Application 외부에서 설정 정보를 읽어, 메타데이터 위치 설정하기.			
+//			//movieReader.setMetadata(environment.getProperty("movie.metadata"));
+//			return movieReader;
+//		}
+//		
+//		@Profile(MovieBuddyProfile.XML_MODE)
+//		@Bean
+//		public XmlMovieReader xmlMovieReader(Unmarshaller unmarshaller) {
+//			XmlMovieReader movieReader = new XmlMovieReader(unmarshaller);
+//			//movieReader.setMetadata(environment.getProperty("movie.metadata"));
+//			return movieReader;
+//		}
 		
-		@Autowired
-		public DataSourceModuleConfig(Environment environment) {
-			this.environment = environment;
-		}
-		
-		@Profile(MovieBuddyProfile.CSV_MODE)
-		@Bean
-		public CsvMovieReader csvMovieReader () {
-			CsvMovieReader movieReader = new CsvMovieReader();
-			
-			//Application 외부에서 설정 정보를 읽어, 메타데이터 위치 설정하기.			
-			//movieReader.setMetadata(environment.getProperty("movie.metadata"));
-			return movieReader;
-		}
-		
-		@Profile(MovieBuddyProfile.XML_MODE)
-		@Bean
-		public XmlMovieReader xmlMovieReader(Unmarshaller unmarshaller) {
-			XmlMovieReader movieReader = new XmlMovieReader(unmarshaller);
-			//movieReader.setMetadata(environment.getProperty("movie.metadata"));
-			return movieReader;
-		}
 	}
 }

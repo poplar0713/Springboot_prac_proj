@@ -4,18 +4,16 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 
@@ -25,7 +23,6 @@ import moviebuddy.ApplicationException;
 import moviebuddy.MovieBuddyProfile;
 import moviebuddy.domain.Movie;
 import moviebuddy.domain.MovieReader;
-import moviebuddy.util.FileSystemUtils;
 
 @Profile(MovieBuddyProfile.CSV_MODE)
 @Repository
@@ -33,9 +30,21 @@ public class CsvMovieReader extends AbstractMetadataSystemMovieReader implements
 	
 //	private final Logger log = LoggerFactory.getLogger(getClass());
 
+	private final CacheManager cacheManager;
+	
+	public CsvMovieReader(CacheManager cacheManager) {
+		this.cacheManager = Objects.requireNonNull(cacheManager);
+	}
+	
 	@Override
 	public List<Movie> loadMovies() {
-    	
+		// Cache에 저장된 데이터가 있다면 즉시 반환한다.
+		Cache cache = cacheManager.getCache(getClass().getName());
+		List<Movie> movies = cache.get("csv.movies", List.class);
+		if (Objects.nonNull(movies) && movies.size() > 0) {
+			return movies;
+		}
+		
         try {
             final InputStream content =  getMetadataResource().getInputStream();
             final Function<String, Movie> mapCsv = csv -> {
@@ -60,7 +69,7 @@ public class CsvMovieReader extends AbstractMetadataSystemMovieReader implements
             };
             
             
-            return new BufferedReader(new InputStreamReader(content, StandardCharsets.UTF_8))
+            movies = new BufferedReader(new InputStreamReader(content, StandardCharsets.UTF_8))
             			.lines()
                         .skip(1)
                         .map(mapCsv)
@@ -68,5 +77,9 @@ public class CsvMovieReader extends AbstractMetadataSystemMovieReader implements
         } catch (IOException error) {
             throw new ApplicationException("failed to load movies data.", error);
         }
+        
+        // 획득한 데이터를 캐시에 저장하고 반환한다.
+        cache.put("csv.moives", movies);
+        return movies;
     }
 }
