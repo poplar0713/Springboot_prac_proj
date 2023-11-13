@@ -29,22 +29,8 @@ import moviebuddy.domain.MovieReader;
 public class CsvMovieReader extends AbstractMetadataSystemMovieReader implements MovieReader {
 	
 //	private final Logger log = LoggerFactory.getLogger(getClass());
-
-	private final CacheManager cacheManager;
-	
-	public CsvMovieReader(CacheManager cacheManager) {
-		this.cacheManager = Objects.requireNonNull(cacheManager);
-	}
-	
 	@Override
 	public List<Movie> loadMovies() {
-		// Cache에 저장된 데이터가 있다면 즉시 반환한다.
-		Cache cache = cacheManager.getCache(getClass().getName());
-		List<Movie> movies = cache.get("csv.movies", List.class);
-		if (Objects.nonNull(movies) && movies.size() > 0) {
-			return movies;
-		}
-		
         try {
             final InputStream content =  getMetadataResource().getInputStream();
             final Function<String, Movie> mapCsv = csv -> {
@@ -69,7 +55,7 @@ public class CsvMovieReader extends AbstractMetadataSystemMovieReader implements
             };
             
             
-            movies = new BufferedReader(new InputStreamReader(content, StandardCharsets.UTF_8))
+            return new BufferedReader(new InputStreamReader(content, StandardCharsets.UTF_8))
             			.lines()
                         .skip(1)
                         .map(mapCsv)
@@ -77,9 +63,5 @@ public class CsvMovieReader extends AbstractMetadataSystemMovieReader implements
         } catch (IOException error) {
             throw new ApplicationException("failed to load movies data.", error);
         }
-        
-        // 획득한 데이터를 캐시에 저장하고 반환한다.
-        cache.put("csv.moives", movies);
-        return movies;
     }
 }
