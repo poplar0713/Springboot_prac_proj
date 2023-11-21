@@ -5,10 +5,9 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.DefaultResourceLoader;
-
-import com.sun.org.slf4j.internal.Logger;
-import com.sun.org.slf4j.internal.LoggerFactory;
 
 import moviebuddy.data.CsvMovieReader;
 import moviebuddy.domain.MovieReader;
@@ -18,6 +17,7 @@ public class JdkDynamicProxyTest {
 	void useDynamicProxy() throws Exception {
 		CsvMovieReader movieReader = new CsvMovieReader();
 		movieReader.setResourceLoader(new DefaultResourceLoader());
+		movieReader.setMetadata("movie_metadata.csv");
 		movieReader.afterPropertiesSet();
 		
 		ClassLoader classLoader = JdkDynamicProxyTest.class.getClassLoader();
@@ -26,7 +26,6 @@ public class JdkDynamicProxyTest {
 		//MovieReader 안에 loadMovie() 가 실행되는 시간을 측정하기 위함 
 		InvocationHandler handler = new PerformanceInvocationHandler(movieReader);
 		
-		
 		MovieReader proxy = (MovieReader) Proxy.newProxyInstance(classLoader, interfaces, handler);
 		proxy.loadMovies();
 		proxy.loadMovies();
@@ -34,7 +33,7 @@ public class JdkDynamicProxyTest {
 	
 	static class PerformanceInvocationHandler implements InvocationHandler {
 
-		//final Logger log = LoggerFactory.getLogger(getClass());
+		final Logger log = LoggerFactory.getLogger(getClass());
 		final Object target;
 		
 		PerformanceInvocationHandler(Object target) {
@@ -47,9 +46,9 @@ public class JdkDynamicProxyTest {
 			Object result = method.invoke(target, args);
 			long elapsed = System.currentTimeMillis() - start;
 			
-			//log.info("Excution {} method finished in {} ms", method.getName(), elapsed);
+			log.info("Excution {} method finished in {} ms", method.getName(), elapsed);
 			
-			return null;
+			return result;
 		}
 		
 	}
