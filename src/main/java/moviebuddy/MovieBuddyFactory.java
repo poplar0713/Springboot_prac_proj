@@ -3,8 +3,12 @@ package moviebuddy;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import org.aopalliance.aop.Advice;
+import org.springframework.aop.Advisor;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.aop.framework.ProxyFactoryBean;
+import org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator;
+import org.springframework.aop.support.DefaultPointcutAdvisor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.caffeine.CaffeineCacheManager;
@@ -84,6 +88,20 @@ public class MovieBuddyFactory {
 		
 		return cacheManager;
 	}
+
+	@Bean
+	public DefaultAdvisorAutoProxyCreator defaultAdvisorAutoProxyCreator() {
+		return new DefaultAdvisorAutoProxyCreator();
+		//proxy를 직접 등록해 주지 않아도 캐시라는 부가기능을 Advisor에 담아서 DefaultAdvisorAutoProxyCreator가 proxy를 자동으로 구성해서 스프링컨테이너에 등록을 해줄것이다
+	}
+
+	@Bean
+	public Advisor cachingAdvisor(CacheManager cacheManager) {
+		Advice advice = new CachingAdvice(cacheManager);
+
+		// Advisor = PointCut(대상 선정 알고리즘) + Advice(부가기능)
+		return new DefaultPointcutAdvisor(advice);
+	}
 	
 	@Configuration
 	static class DataSourceModuleConfig {
@@ -113,32 +131,31 @@ public class MovieBuddyFactory {
 //			return movieReader;
 //		}
 		
-		@Primary
-		@Bean
-		public ProxyFactoryBean cachingMovieReaderFactory(ApplicationContext applicationContext) {
-			MovieReader target = applicationContext.getBean(MovieReader.class);
-			CacheManager cahceManager = applicationContext.getBean(CacheManager.class);
-			
-			ProxyFactoryBean proxyFactoryBean = new ProxyFactoryBean();
-			proxyFactoryBean.setTarget(target);
-			
-			// 이 클래스 proxy는 CGLIB라는 바이트코드 생성 라이브러리를 통해 대상 객체타입을 상속해서 서브 클래스로 만들어 이를 proxy로 사용한다.
-			// 즉, 서브클래스도 자신이 상속한 대상 객체와 같은 타입이니까 클라언트에게 의존 관계 주입이 가능하다는 원리를 이용 
-			// 이 클래스 proxy는 두가지 제약이 있는데, final 클래스와 final 메소드에는 적용이 안되고 같은 대상 클래스 타입의 빈이 두개가 만들어지기 때문에 대상 클래스 생성자가 두번 호출된다는 점이다. 
-			
-			// 이 방식은 매우 부자연스러운데, 프락시를 사용하기 위해서 동적으로 클래스를 상속할 뿐 더러, 이 상속받은 객체의 public 메소드를 모두 오버라이드 해서 
-			// 프락시 기능으로 바꿔치는 방식으로 동작하기 때문이다. 
-			
-			// 스프링은 인터페이스가 없이 개발된 레거시코드나, 외부에서 개발된 인터페이스 없는 라이브러리들을 이 proxy 기법을 적용할 수 있도록 지원해 주기 위해서 
-			// 클래스 proxy를 지원한다.
-//			proxyFactoryBean.setProxyTargetClass(true); // 클래스 프록시 활성화 코드 
-			
-			
-			proxyFactoryBean.addAdvice(new CachingAdvice(cahceManager));
-			
-			return proxyFactoryBean;
-			
-		}
-		
+//		@Primary
+//		@Bean
+//		public ProxyFactoryBean cachingMovieReaderFactory(ApplicationContext applicationContext) {
+//			MovieReader target = applicationContext.getBean(MovieReader.class);
+//			CacheManager cahceManager = applicationContext.getBean(CacheManager.class);
+//
+//			ProxyFactoryBean proxyFactoryBean = new ProxyFactoryBean();
+//			proxyFactoryBean.setTarget(target);
+//
+//			// 이 클래스 proxy는 CGLIB라는 바이트코드 생성 라이브러리를 통해 대상 객체타입을 상속해서 서브 클래스로 만들어 이를 proxy로 사용한다.
+//			// 즉, 서브클래스도 자신이 상속한 대상 객체와 같은 타입이니까 클라언트에게 의존 관계 주입이 가능하다는 원리를 이용
+//			// 이 클래스 proxy는 두가지 제약이 있는데, final 클래스와 final 메소드에는 적용이 안되고 같은 대상 클래스 타입의 빈이 두개가 만들어지기 때문에 대상 클래스 생성자가 두번 호출된다는 점이다.
+//
+//			// 이 방식은 매우 부자연스러운데, 프락시를 사용하기 위해서 동적으로 클래스를 상속할 뿐 더러, 이 상속받은 객체의 public 메소드를 모두 오버라이드 해서
+//			// 프락시 기능으로 바꿔치는 방식으로 동작하기 때문이다.
+//
+//			// 스프링은 인터페이스가 없이 개발된 레거시코드나, 외부에서 개발된 인터페이스 없는 라이브러리들을 이 proxy 기법을 적용할 수 있도록 지원해 주기 위해서
+//			// 클래스 proxy를 지원한다.
+////			proxyFactoryBean.setProxyTargetClass(true); // 클래스 프록시 활성화 코드
+//
+//
+//			proxyFactoryBean.addAdvice(new CachingAdvice(cahceManager));
+//
+//			return proxyFactoryBean;
+//
+//		}
 	}
 }
