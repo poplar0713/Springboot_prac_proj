@@ -2,6 +2,8 @@
 
 import java.util.List;
 
+import javax.cache.annotation.CacheResult;
+
 public interface MovieReader {
 	
 	/**
@@ -10,5 +12,6 @@ public interface MovieReader {
      * @return 불러온 영화 목록
      */
 	
+	@CacheResult(cacheName = "movies")
 	public List<Movie> loadMovies();
 }

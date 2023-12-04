@@ -4,8 +4,14 @@ import java.util.Objects;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.aop.Pointcut;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
+import org.springframework.util.ClassUtils;
+
+import moviebuddy.domain.MovieReader;
 
 /*
  * 코드의 역할 :
@@ -18,7 +24,8 @@ import org.springframework.cache.CacheManager;
  * */
 
 public class CachingAdvice implements MethodInterceptor {
-
+	
+	private final Logger log = LoggerFactory.getLogger(getClass());
 	private final CacheManager cacheManager;
 	
 	public CachingAdvice(CacheManager cacheManager) {
@@ -32,12 +39,14 @@ public class CachingAdvice implements MethodInterceptor {
 		Object cachedValue = cache.get(invocation.getMethod().getName(), Object.class);
 		
 		if(Objects.nonNull(cachedValue)) {
+			log.info("returns cached data. [{}]", invocation);
 			return cachedValue;
 		}		
 		
 		// 캐시된 데이터없으면 대상객체에 명령 위임, 반환된 값을 캐시에 저장
 		cachedValue = invocation.proceed();
 		cache.put(invocation.getMethod().getName(), cachedValue);
+		log.info("caching return value. [{}]", invocation);
 		
 		return cachedValue;
 	}
