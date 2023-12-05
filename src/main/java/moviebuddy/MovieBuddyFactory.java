@@ -15,6 +15,7 @@ import org.springframework.aop.support.NameMatchMethodPointcut;
 import org.springframework.aop.support.annotation.AnnotationMatchingPointcut;
 //import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.caffeine.CaffeineCacheManager;
 //import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -50,7 +51,8 @@ import moviebuddy.cache.CachingAspect;
 @Configuration
 @PropertySource("application.properties")
 @ComponentScan(basePackages = { "moviebuddy" })
-@EnableAspectJAutoProxy
+//@EnableAspectJAutoProxy
+@EnableCaching
 @Import({MovieBuddyFactory.DomainModuleConfig.class, MovieBuddyFactory.DataSourceModuleConfig.class})
 public class MovieBuddyFactory {
 	
@@ -114,10 +116,10 @@ public class MovieBuddyFactory {
 	}
 	*/
 	
-	@Bean
-	public CachingAspect cachingAspect(CacheManager cacheManager) {
-		return new CachingAspect(cacheManager);
-	}
+//	@Bean
+//	public CachingAspect cachingAspect(CacheManager cacheManager) {
+//		return new CachingAspect(cacheManager);
+//	}
 	
 	@Configuration
 	static class DataSourceModuleConfig {
