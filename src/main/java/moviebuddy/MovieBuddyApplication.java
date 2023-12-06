@@ -5,6 +5,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -14,17 +15,31 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.support.ResourceBundleMessageSource;
 
 import moviebuddy.domain.Movie;
 import moviebuddy.domain.MovieFinder;
 
+@Configuration
+@PropertySource("/messages.properties")
 public class MovieBuddyApplication {
+	
+	@Bean
+	public MessageSource messageSource() {
+		ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
+		messageSource.setBasename("messages"); // messages.properites 파일 찾기 
+		messageSource.setDefaultEncoding("utf-8");
+		return messageSource;
+	}
 
     public static void main(String[] args) throws Exception {
         new MovieBuddyApplication().run(args);
     }
-
     /*
      * 애플리케이션 추가 요구사항:
      * 
@@ -36,7 +51,8 @@ public class MovieBuddyApplication {
 
     public void run(String[] args) throws Exception {
     	
-    	final ApplicationContext applicationContext = new AnnotationConfigApplicationContext(MovieBuddyFactory.class);
+    	final ApplicationContext applicationContext = new AnnotationConfigApplicationContext(MovieBuddyFactory.class, MovieBuddyApplication.class);
+    	final MessageSource messageSource = applicationContext.getBean(MessageSource.class);
     	final MovieFinder movie = applicationContext.getBean(MovieFinder.class);
     	
         final AtomicBoolean running = new AtomicBoolean(true);
@@ -49,7 +65,7 @@ public class MovieBuddyApplication {
         final Map<Command, Consumer<List<String>>> commandActions = new HashMap<>();
         // 애플리케이션 종료:: ❯ quit
         commandActions.put(Command.Quit, arguments -> {
-            output.println("quit application.");
+            output.println(messageSource.getMessage("application.commands.quit", new Object[0], Locale.getDefault()));
             running.set(false);
         });
         // 감독으로 영화 검색:: ❯ directedBy Michael Bay
@@ -61,12 +77,12 @@ public class MovieBuddyApplication {
             List<Movie> moviesDirectedBy = movie.directedBy(director);
             AtomicInteger counter = new AtomicInteger(1);
 
-            output.println(String.format("find for movies by %s.", director));
+            output.println(messageSource.getMessage("application.commands.directedBy", new Object[] { director }, Locale.getDefault()));
             moviesDirectedBy.forEach(it -> {
-                String data = String.format("%d. title: %-50s\treleaseYear: %d\tdirector: %-25s\twatchedDate: %s", counter.getAndIncrement(), it.getTitle(), it.getReleaseYear(), it.getDirector(), it.getWatchedDate().format(Movie.DEFAULT_WATCHED_DATE_FORMATTER));
+                String data = messageSource.getMessage("application.commands.directedBy.format", new Object[] { counter.getAndIncrement(), it.getTitle(), it.getReleaseYear(), it.getDirector(), it.getWatchedDate().format(Movie.DEFAULT_WATCHED_DATE_FORMATTER) }, Locale.getDefault());
                 output.println(data);
             });
-            output.println(String.format("%d movies found.", moviesDirectedBy.size()));
+            output.println(messageSource.getMessage("application.commands.directedBy.count", new Object[] { moviesDirectedBy.size() }, Locale.getDefault()));
         });
         // 개봉년도로 영화 검색:: ❯ releasedYearBy 2015
         commandActions.put(Command.releasedYearBy, arguments -> {
@@ -89,9 +105,9 @@ public class MovieBuddyApplication {
 
         /*--------------------------------------------------------------------------------------*/
         /* 사용자가 입력한 값을 해석 후 연결된 명령을 실행한다. */
-
+       
         output.println();
-        output.println("application is ready.");
+        output.println(messageSource.getMessage("application.ready", new Object[0], Locale.getDefault()));
 
         // quit(애플리케이션 종료) 명령어가 입력되기 전까지 무한히 반복하기(infinite loop)
         while (running.get()) {
