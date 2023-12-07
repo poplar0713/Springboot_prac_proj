@@ -95,12 +95,12 @@ public class MovieBuddyApplication {
             List<Movie> moviesReleasedYearBy = movie.releasedYearBy(releaseYear);
             AtomicInteger counter = new AtomicInteger(1);
 
-            output.println(String.format("find for movies from %s year.", releaseYear));
+            output.println(messageSource.getMessage("application.commands.releasedYearBy", new Object[] { releaseYear }, Locale.getDefault()));
             moviesReleasedYearBy.forEach(it -> {
-                String data = String.format("%d. title: %-50s\treleaseYear: %d\tdirector: %-25s\twatchedDate: %s", counter.getAndIncrement(), it.getTitle(), it.getReleaseYear(), it.getDirector(), it.getWatchedDate().format(Movie.DEFAULT_WATCHED_DATE_FORMATTER));
+                String data = messageSource.getMessage("application.commands.releasedYearBy.format", new Object[] {counter.getAndIncrement(), it.getTitle(), it.getReleaseYear(), it.getDirector(), it.getWatchedDate().format(Movie.DEFAULT_WATCHED_DATE_FORMATTER)}, Locale.getDefault());
                 output.println(data);
             });
-            output.println(String.format("%d movies found.", moviesReleasedYearBy.size()));
+            output.println(messageSource.getMessage("application.commands.releasedYearBy.count", new Object[] {moviesReleasedYearBy.size()}, Locale.getDefault()));
         });
 
         /*--------------------------------------------------------------------------------------*/
@@ -128,7 +128,21 @@ public class MovieBuddyApplication {
                 }
                 commandAction.accept(arguments);
             } catch (ApplicationException error) {
-                output.println(error.getMessage());
+//            	if(error instanceof ApplicationException.CommandNotFoundException) {
+//            		output.print(messageSource.getMessage("application.error.commandNotFoundError", new Object[0], Locale.getDefault()));
+//            	} else if (error instanceof ApplicationException.UndefinedCommandActionException) {
+//            		
+//            	} else if (error instanceof ApplicationException.InvalidCommandArgumentsException ) {
+//            		
+//            	} else {
+//            		
+//            	}
+            	//application.error.CommandNotFoundException
+            	//.UndefinedCommandActionException
+            	//.InvalidCommandArgumentsException
+            	String code = String.format("application.error.%s", error.getClass().getSimpleName());
+            	output.println(messageSource.getMessage(code, new Object[0], error.getMessage(), Locale.getDefault()));
+            	
             } finally {
                 output.flush();
             }
