@@ -20,6 +20,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.context.support.ResourceBundleMessageSource;
 
 import moviebuddy.domain.Movie;
@@ -31,9 +32,10 @@ public class MovieBuddyApplication {
 	
 	@Bean
 	public MessageSource messageSource() {
-		ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
+		ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
 		messageSource.setBasename("messages"); // messages.properites 파일 찾기 
 		messageSource.setDefaultEncoding("utf-8");
+		messageSource.setCacheSeconds(5);
 		return messageSource;
 	}
 
